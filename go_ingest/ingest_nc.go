@@ -6,6 +6,7 @@ import (
 	"path/filepath"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/batchatco/go-native-netcdf/netcdf"
@@ -161,9 +162,15 @@ func main() {
 	start := time.Now()
 
 	files := getFYDirsAndFiles(DATA_PATH)
+	var wg sync.WaitGroup
 	for _, file := range files {
-		ingestNCFile(file)
+		wg.Add(1)
+		go func(file string) {
+			defer wg.Done()
+			ingestNCFile(file)
+		}(file)
 	}
+	wg.Wait()
 
 	elapsed := time.Since(start)
 	msg := fmt.Sprintf("Total runtime: %s seconds", strconv.FormatFloat(elapsed.Seconds(), 'f', 2, 64))
