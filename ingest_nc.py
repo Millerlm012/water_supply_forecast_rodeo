@@ -39,6 +39,7 @@ def ingest_nc_file(file_path):
     with open(file_path.replace('.nc', '.csv'), 'w') as f:
         EASTERN_BORDER_OF_NEW_MEXICO_LONGITUDE = -103 # further negative west (desc) - east (asc)
         for lat_index, lat in enumerate(latitudes):
+            lines = ''
             for lon_index, lon in enumerate(longitudes):
                 if lon > EASTERN_BORDER_OF_NEW_MEXICO_LONGITUDE:
                     break
@@ -53,7 +54,11 @@ def ingest_nc_file(file_path):
 
                 if ',,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,' not in line:
                     line += '\n'
-                    f.write(line)
+                    lines += line
+            f.write(lines)
+
+            if lat_index % 100 == 0:
+                print(f"{file_path.split('/')[-1:]} at {lat_index} of 584")
 
 def main():
     start = datetime.now()
